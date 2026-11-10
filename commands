@@ -1,0 +1,91 @@
+docker --version
+docker compose version
+mkdir jenkins-static-site
+cd jenkins-static-site
+notepad docker-compose.yml
+docker compose up -d
+docker ps
+docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+http://localhost:8080
+docker ps
+
+docker-compose.yml
+
+services:
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+    restart: unless-stopped
+
+volumes:
+  jenkins_home:
+
+Pipeline Script
+Paste this under Pipeline → Pipeline script.
+pipeline {
+    agent any
+
+    stages {
+        stage('Generate site') {
+            steps {
+                script {
+                    sh 'mkdir -p site/assets'
+
+                    writeFile file: 'site/index.html', text: '''
+                    <html>
+                    <head>
+                        <title>Karunya University</title>
+                        <link rel="stylesheet" href="assets/style.css">
+                    </head>
+                    <body>
+                        <h1>Welcome to Karunya University</h1>
+                        <p>DevOps Lab - Jenkins Deployment Using Docker</p>
+                    </body>
+                    </html>
+                    '''
+
+                    writeFile file: 'site/assets/style.css', text: '''
+                    body {
+                        font-family: Arial;
+                        text-align: center;
+                        background-color: lightblue;
+                        padding: 50px;
+                    }
+                    h1 {
+                        color: darkblue;
+                    }
+                    '''
+                }
+            }
+        }
+
+        stage('Publish site') {
+            steps {
+                publishHTML(target: [
+                    reportName: 'Karunya University - Simple Site',
+                    reportDir: 'site',
+                    reportFiles: 'index.html',
+                    keepAll: true,
+                    alwaysLinkToLastBuild: true,
+                    allowMissing: false
+                ])
+
+                archiveArtifacts artifacts: 'site/**/*',
+                                 fingerprint: true
+            }
+        }
+    }
+}
+
+
+5. Important Output Verification
+- Jenkins dashboard opened successfully.
+- Pipeline job karunya-site-pipeline created.
+- Build completed successfully.
+- Karunya University static website displayed.
+- HTML and CSS files archived successfully.
