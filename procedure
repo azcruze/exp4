@@ -1,0 +1,81 @@
+Opened Command Prompt and verified Docker and Docker Compose versions.
+
+
+
+Created a folder named jenkins-static-site on the E: drive.
+
+
+
+Navigated to the project directory.
+
+
+
+Created the docker-compose.yml file using Notepad.
+
+
+
+Configured the Jenkins image, container name, port mappings, restart policy and persistent Docker volume.
+
+
+
+Started Jenkins using the docker compose up -d command.
+
+
+
+Verified that the Jenkins container was running using docker ps.
+
+
+
+Retrieved the initial administrator password using the Docker exec command.
+
+
+
+Opened http://localhost:8080 in the browser and unlocked Jenkins.
+
+
+
+Installed the suggested Jenkins plugins and created an administrator account.
+
+
+
+Opened Manage Jenkins → Plugins and installed the HTML Publisher plugin.
+
+
+
+Created a new Pipeline job named karunya-site-pipeline.
+
+
+
+Selected Pipeline script under the Pipeline definition.
+
+
+
+Entered the pipeline script to generate the Karunya University website using HTML and CSS.
+
+
+
+Configured the Generate site stage to create site/index.html and site/assets/style.css.
+
+
+
+Configured the Publish site stage using the HTML Publisher plugin.
+
+
+
+Added the archiveArtifacts step to archive the generated website files.
+
+
+
+Saved the pipeline configuration and clicked Build Now.
+
+
+
+Verified that the pipeline build completed successfully.
+
+
+
+Opened Karunya University - Simple Site from the job page and confirmed that the website was displayed correctly.
+
+
+
+Opened the successful build and verified that index.html and style.css artifacts were archived.
