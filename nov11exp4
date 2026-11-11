@@ -1,0 +1,195 @@
+Experiment 4 – Jenkins Static Website Deployment Using Docker
+1. Aim
+To install and configure Jenkins using Docker and create a Jenkins Pipeline to generate and publish a static website.
+2. Procedure
+Step 1 – Check Docker installation
+Open Windows Command Prompt and execute:
+docker --version
+docker compose version
+
+
+Step 2 – Create the project folder
+mkdir jenkins-static-site
+cd jenkins-static-site
+
+
+Step 3 – Create Docker Compose file
+notepad docker-compose.yml
+
+
+Paste the following configuration into Notepad:
+
+services:
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+    restart: unless-stopped
+
+volumes:
+  jenkins_home:
+
+
+
+Save the file as docker-compose.yml and close Notepad.
+Step 4 – Start Jenkins container
+Execute:
+docker compose up -d
+
+
+This downloads the Jenkins image if needed and starts Jenkins in the background.
+Step 5 – Verify the container
+docker ps
+
+
+Check that the Jenkins container is running and port 8080 is mapped.
+Step 6 – Get the initial administrator password
+docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+
+
+Copy the password displayed in CMD.
+Step 7 – Open Jenkins in the browser
+Open:
+
+http://localhost:8080
+1. Paste the initial administrator password.
+2. Click Install suggested plugins.
+3. Wait for the plugins to install.
+4. Create your administrator account.
+5. Continue until the Jenkins dashboard appears.
+Step 8 – Install HTML Publisher plugin
+1. Open Manage Jenkins.
+2. Select Plugins.
+3. Search for HTML Publisher.
+4. Install the plugin.
+5. Restart Jenkins if requested.
+Step 9 – Create a Pipeline job
+1. Click New Item.
+2. Enter the name: karunya-site-pipeline.
+3. Select Pipeline.
+4. Click OK.
+5. Scroll to the Pipeline section.
+6. Select Pipeline script under Definition.
+Step 10 – Enter the Pipeline script
+Paste this complete script into the Pipeline Script box:
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Generate site') {
+            steps {
+                script {
+                    sh 'mkdir -p site/assets'
+
+                    writeFile file: 'site/index.html', text: '''
+                    <html>
+                    <head>
+                        <title>Karunya University</title>
+                        <link rel="stylesheet" href="assets/style.css">
+                    </head>
+                    <body>
+                        <h1>Welcome to Karunya University</h1>
+                        <p>DevOps Lab - Jenkins Deployment Using Docker</p>
+                    </body>
+                    </html>
+                    '''
+
+                    writeFile file: 'site/assets/style.css', text: '''
+                    body {
+                        font-family: Arial;
+                        text-align: center;
+                        background-color: lightblue;
+                        padding: 50px;
+                    }
+                    h1 {
+                        color: darkblue;
+                    }
+                    '''
+                }
+            }
+        }
+
+        stage('Publish site') {
+            steps {
+                publishHTML(target: [
+                    reportName: 'Karunya University - Simple Site',
+                    reportDir: 'site',
+                    reportFiles: 'index.html',
+                    keepAll: true,
+                    alwaysLinkToLastBuild: true,
+                    allowMissing: false
+                ])
+
+                archiveArtifacts artifacts: 'site/**/*',
+                                 fingerprint: true
+            }
+        }
+    }
+}
+
+
+
+Step 11 – Save and execute the Pipeline
+1. Click Save.
+2. Click Build Now.
+3. Wait for the build to finish.
+4. Open the build number.
+5. Select Console Output.
+6. Verify that the build displays:
+Finished: SUCCESS
+
+
+Step 12 – Verify the published website
+1. Return to the Jenkins job dashboard.
+2. Find the published HTML report link.
+3. Click Karunya University - Simple Site.
+4. Verify that the static website is displayed.
+Welcome to Karunya University
+DevOps Lab - Jenkins Deployment Using Docker
+
+Expected website output
+
+Step 13 – Verify archived files
+Open the completed build and check the Artifacts section.
+
+Expected files:
+site/index.html
+site/assets/style.css
+
+
+3. Important CMD commands – Complete list
+These are all the terminal commands used in the experiment, in order:
+docker --version
+docker compose version
+
+mkdir jenkins-static-site
+cd jenkins-static-site
+
+notepad docker-compose.yml
+
+docker compose up -d
+
+docker ps
+
+docker exec jenkins cat /var/jenkins_home/secrets/initialAdminPassword
+
+docker ps
+
+
+The Docker Compose configuration and Pipeline script are pasted into their respective files or Jenkins interface, not executed as CMD commands.
+4. Expected Output
+- Jenkins container runs successfully using Docker.
+- Jenkins dashboard opens at http://localhost:8080.
+- Pipeline job karunya-site-pipeline is created.
+- Build completes with Finished: SUCCESS.
+- Karunya University static website is published.
+- HTML and CSS files are archived successfully.
+5. Result
+Jenkins was successfully installed and configured using Docker. A Pipeline was created to generate and publish a static website, and the generated HTML and CSS files were archived successfully.
+Memory tip
+Docker → Folder → Compose → Start → Password → Jenkins → P
